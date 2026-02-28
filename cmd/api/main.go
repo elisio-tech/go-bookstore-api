@@ -11,6 +11,7 @@ func main() {
 	database.InitDB()
 	route := gin.Default()
 	route.GET("/books", handlers.GetBooks)
+	route.GET("/books/:id", handlers.GetBook)
 
 	route.Run(":8080")
 }

@@ -14,3 +14,11 @@ func FindAllBooks() ([]models.Book, error) {
 	}
 	return books, nil
 }
+
+func FindBookById(id uint) (models.Book, error) {
+	var book models.Book
+	if err := database.DB.First(&book, id).Error; err != nil {
+		return models.Book{}, err
+	}
+	return book, nil
+}
