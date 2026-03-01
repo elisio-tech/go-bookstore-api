@@ -12,6 +12,8 @@ func main() {
 	route := gin.Default()
 	route.GET("/books", handlers.GetBooks)
 	route.GET("/books/:id", handlers.GetBook)
+	route.POST("/books", handlers.CreateBook)
+	route.DELETE("/books/:id", handlers.DeleteBook)
 
 	route.Run(":8080")
 }
