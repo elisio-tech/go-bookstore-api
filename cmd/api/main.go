@@ -1,19 +1,20 @@
 package main
 
 import (
-	"go-bookstore-api/database"
-	"go-bookstore-api/internal/handlers"
+	"go-bookstore-api/internal/infrastructure/database"
+
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	database.InitDB()
-	route := gin.Default()
-	route.GET("/books", handlers.GetBooks)
-	route.GET("/books/:id", handlers.GetBook)
-	route.POST("/books", handlers.CreateBook)
-	route.DELETE("/books/:id", handlers.DeleteBook)
 
-	route.Run(":8080")
+	r := gin.Default()
+	r.GET("/books", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"massage": "pong"})
+		return
+	})
+	r.Run(":8080")
 }
