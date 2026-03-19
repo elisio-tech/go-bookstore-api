@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"go-bookstore-api/internal/models"
+	"go-bookstore-api/internal/domain/entity"
 
 	"gorm.io/gorm"
 )
@@ -15,8 +15,8 @@ func NewGormBookRepository(db *gorm.DB) *GormBookRepository {
 	return &GormBookRepository{db: db}
 }
 
-func (r *GormBookRepository) FindAll() ([]models.Book, error) {
-	var books []models.Book
+func (r *GormBookRepository) FindAll() ([]entity.Book, error) {
+	var books []entity.Book
 
 	err := r.db.Find(&books).Error
 	if err != nil {
@@ -25,20 +25,20 @@ func (r *GormBookRepository) FindAll() ([]models.Book, error) {
 	return books, nil
 }
 
-func (r *GormBookRepository) Create(book *models.Book) error {
+func (r *GormBookRepository) CreateBook(book *entity.Book) error {
 	return r.db.Create(book).Error
 }
 
-func (r *GormBookRepository) GetByID(id string) (*models.Book, error) {
-	var book models.Book
+func (r *GormBookRepository) GetByID(id string) (*entity.Book, error) {
+	var book entity.Book
 	err := r.db.First(&book, "id = ?", id).Error
 	return &book, err
 }
 
-func (r *GormBookRepository) Update(book *models.Book) error {
+func (r *GormBookRepository) Update(book *entity.Book) error {
 	return r.db.Save(book).Error
 }
 
 func (r *GormBookRepository) Delete(id string) error {
-	return r.db.Delete(&models.Book{}, id).Error
+	return r.db.Delete(&entity.Book{}, id).Error
 }

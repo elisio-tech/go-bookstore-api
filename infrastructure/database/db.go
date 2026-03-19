@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"go-bookstore-api/internal/models"
+	"go-bookstore-api/internal/domain/entity"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,7 +17,7 @@ func InitDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("falha ao abrir o banco: %w", err)
 	}
 
-	err = db.AutoMigrate(&models.Book{})
+	err = db.AutoMigrate(&entity.Book{})
 	if err != nil {
 		return nil, fmt.Errorf("Falha na migracao: %w", err)
 	}
