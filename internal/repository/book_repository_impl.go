@@ -10,7 +10,8 @@ type GormBookRepository struct {
 	db *gorm.DB
 }
 
-func NewGormRepository(db *gorm.DB) *GormBookRepository {
+// lida com banco de dados abre e fecha conexao
+func NewGormBookRepository(db *gorm.DB) *GormBookRepository {
 	return &GormBookRepository{db: db}
 }
 
