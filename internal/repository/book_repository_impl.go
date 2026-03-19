@@ -29,3 +29,7 @@ func (r *GormBookRepository) GetByID(id string) (*models.Book, error) {
 	err := r.db.First(&book, "id = ?", id).Error
 	return &book, err
 }
+
+func (r *GormBookRepository) Update(book *models.Book) error {
+	return r.db.Save(book).Error
+}
