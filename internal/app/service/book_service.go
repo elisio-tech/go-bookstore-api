@@ -25,8 +25,8 @@ func (s *BookService) CreateBook(request dto.RequestBook) (*dto.ResponseBook, er
 		Author: request.Author,
 		Price:  request.Price,
 	}
-	book, err := s.bookRepo.Create(book)
-	if err != nil {
+
+	if _, err := s.bookRepo.Create(book); err != nil {
 		return nil, err
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-bookstore-api/infrastructure/database"
+	"go-bookstore-api/internal/infrastructure/database"
 
 	"github.com/gin-gonic/gin"
 )
