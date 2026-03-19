@@ -1,22 +1,25 @@
 package database
 
 import (
-	"errors"
+	"fmt"
 	"go-bookstore-api/internal/models"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
-func InitDB() error {
+func InitDB() (*gorm.DB, error) {
 	var err error
-	DB, err = gorm.Open(sqlite.Open("bookstore.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("bookstore.db"), &gorm.Config{})
 	if err != nil {
-		return errors.New("Erro ao conetar ao banco de dados")
+		return nil, fmt.Errorf("falha ao abrir o banco: %w", err)
 	}
 
-	DB.AutoMigrate(&models.Book{})
-	return nil
+	err = db.AutoMigrate(&models.Book{})
+	if err != nil {
+		return nil, fmt.Errorf("Falha na migracao: %w", err)
+	}
+	return db, nil
 }
