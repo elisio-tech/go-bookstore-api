@@ -8,18 +8,18 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 
 func InitDB() (*gorm.DB, error) {
 	var err error
-	db, err = gorm.Open(sqlite.Open("data/bookstore.db"), &gorm.Config{})
+	DB, err = gorm.Open(sqlite.Open("data/bookstore.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("falha ao abrir o banco: %w", err)
 	}
 
-	err = db.AutoMigrate(&entity.Book{})
+	err = DB.AutoMigrate(&entity.Book{})
 	if err != nil {
 		return nil, fmt.Errorf("Falha na migracao: %w", err)
 	}
-	return db, nil
+	return DB, nil
 }

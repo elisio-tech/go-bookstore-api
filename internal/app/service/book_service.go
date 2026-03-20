@@ -26,7 +26,8 @@ func (s *BookService) CreateBook(request dto.RequestBook) (*dto.ResponseBook, er
 		Price:  request.Price,
 	}
 
-	if _, err := s.bookRepo.Create(book); err != nil {
+	// chama o repository
+	if err := s.bookRepo.Create(book); err != nil {
 		return nil, err
 	}
 
@@ -39,7 +40,7 @@ func (s *BookService) CreateBook(request dto.RequestBook) (*dto.ResponseBook, er
 }
 
 func (s *BookService) GetBooks() ([]entity.Book, error) {
-	books, err := s.bookRepo.FindAll()
+	books, err := s.bookRepo.List()
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +55,10 @@ func (s *BookService) GetBookByID(id string) (*entity.Book, error) {
 	return book, nil
 }
 
-func (s *BookService) UpdateBook(book *entity.Book) error {
-	return s.UpdateBook(book)
+func (s *BookService) UpdateBook(id string, book *entity.Book) error {
+	return s.bookRepo.Update(id, book)
+}
+
+func (s *BookService) DeleteBook(id string) error {
+	return s.bookRepo.Delete(id)
 }
