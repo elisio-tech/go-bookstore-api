@@ -44,5 +44,5 @@ func (r *SQLiteBookRepository) Update(id string, book *entity.Book) error {
 }
 
 func (r *SQLiteBookRepository) Delete(id string) error {
-	return r.db.Delete(&entity.Book{}, id).Error
+	return r.db.Delete(&entity.Book{}, "id = ?", id).Error
 }
