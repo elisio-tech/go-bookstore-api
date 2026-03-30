@@ -31,12 +31,10 @@ func (r *SQLiteBookRepository) Create(book *entity.Book) error {
 func (r *SQLiteBookRepository) GetByID(id string) (*entity.Book, error) {
 	var book entity.Book
 
-	err := r.db.First(&book, "id = ?", id).Error
-	if err != nil {
+	if err := r.db.First(&book, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-
-	return &book, err
+	return &book, nil
 }
 
 func (r *SQLiteBookRepository) Update(id string, book *entity.Book) error {

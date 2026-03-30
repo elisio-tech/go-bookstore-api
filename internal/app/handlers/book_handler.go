@@ -4,6 +4,7 @@ import (
 	"go-bookstore-api/internal/app/dto"
 	"go-bookstore-api/internal/app/service"
 	"go-bookstore-api/internal/domain/entity"
+	"strings"
 
 	"net/http"
 
@@ -74,9 +75,19 @@ func (h *BookHandler) UpdateBook(ctx *gin.Context) {
 
 func (h *BookHandler) DeleteBook(ctx *gin.Context) {
 	id := ctx.Param("id")
+
+	if id == "" {
+		ctx.JSON(400, gin.H{"error": "id is required"})
+		return
+	}
+
 	err := h.service.DeleteBook(id)
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "not found") {
+			ctx.JSON(404, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(500, gin.H{"error": "internal server error"})
 		return
 	}
 	ctx.JSON(200, gin.H{"message": "Book deleted successfully"})
