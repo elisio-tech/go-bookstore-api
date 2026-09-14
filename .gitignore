@@ -1,0 +1,24 @@
+# Binary
+/app
+/bin/
+bookstore
+
+# Database
+/data/*.db*
+!data/.gitkeep
+
+# Environment
+.env
+*.env
+
+# Go
+*.test
+*.out
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log

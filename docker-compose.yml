@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     build: .
@@ -7,9 +5,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      PORT: 3000
+      PORT: "3000"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET must be set}"
+      DB_PATH: "/app/data/bookstore.db"
+      ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-http://localhost:3000}"
     volumes:
       - db-data:/app/data
+    restart: unless-stopped
 
 volumes:
   db-data:

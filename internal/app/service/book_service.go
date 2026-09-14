@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+
 	"go-bookstore-api/internal/app/dto"
 	"go-bookstore-api/internal/domain/entity"
 	"go-bookstore-api/internal/domain/repository"
@@ -19,17 +20,12 @@ func NewBookService(repo repository.BookRepository) *BookService {
 }
 
 func (s *BookService) CreateBook(req dto.RequestBook) (*dto.ResponseBook, error) {
-	if req.Price < 0 {
-		return nil, fmt.Errorf("preço deve ser maior que zero")
-	}
-
 	book := &entity.Book{
 		Title:  req.Title,
 		Author: req.Author,
 		Price:  req.Price,
 	}
 
-	// chama o repository
 	if err := s.bookRepo.Create(book); err != nil {
 		return nil, err
 	}
@@ -43,32 +39,42 @@ func (s *BookService) CreateBook(req dto.RequestBook) (*dto.ResponseBook, error)
 }
 
 func (s *BookService) GetBooks() ([]entity.Book, error) {
-	books, err := s.bookRepo.List()
-	if err != nil {
-		return nil, err
-	}
-	return books, nil
+	return s.bookRepo.List()
 }
 
 func (s *BookService) GetBookByID(id string) (*entity.Book, error) {
-	book, err := s.bookRepo.GetByID(id)
+	return s.bookRepo.GetByID(id)
+}
+
+func (s *BookService) UpdateBook(id string, req dto.UpdateBookRequest) (*entity.Book, error) {
+	existing, err := s.bookRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
-	return book, nil
-}
 
-func (s *BookService) UpdateBook(id string, book *entity.Book) error {
-	return s.bookRepo.Update(id, book)
+	if req.Title != "" {
+		existing.Title = req.Title
+	}
+	if req.Author != "" {
+		existing.Author = req.Author
+	}
+	if req.Price != 0 {
+		existing.Price = req.Price
+	}
+
+	if err := s.bookRepo.Update(id, existing); err != nil {
+		return nil, err
+	}
+	return existing, nil
 }
 
 func (s *BookService) DeleteBook(id string) error {
 	err := s.bookRepo.Delete(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("Livro nao encontrado")
+			return fmt.Errorf("livro não encontrado")
 		}
-		return fmt.Errorf("failed to delete book: %w", err)
+		return fmt.Errorf("falha ao excluir livro: %w", err)
 	}
 	return nil
 }

@@ -38,7 +38,7 @@ func (r *SQLiteBookRepository) GetByID(id string) (*entity.Book, error) {
 }
 
 func (r *SQLiteBookRepository) Update(id string, book *entity.Book) error {
-	return r.db.Model(&entity.Book{}).Where("id = ?", id).Updates(book).Error
+	return r.db.Model(&entity.Book{}).Where("id = ?", id).Select("*").Updates(book).Error
 }
 
 func (r *SQLiteBookRepository) Delete(id string) error {

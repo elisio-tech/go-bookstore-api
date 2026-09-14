@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"go-bookstore-api/internal/app/dto"
-	"go-bookstore-api/internal/app/service"
-	"go-bookstore-api/internal/domain/entity"
+	"errors"
+	"net/http"
 	"strings"
 
-	"net/http"
+	"go-bookstore-api/internal/app/dto"
+	"go-bookstore-api/internal/app/service"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type BookHandler struct {
@@ -22,25 +23,27 @@ func NewBookHandler(svc *service.BookService) *BookHandler {
 func (h *BookHandler) CreateBook(ctx *gin.Context) {
 	var req dto.RequestBook
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	book, err := h.service.CreateBook(req)
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, book)
+	ctx.JSON(http.StatusCreated, book)
 }
 
 func (h *BookHandler) GetBooks(ctx *gin.Context) {
 	books, err := h.service.GetBooks()
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	ctx.JSON(200, books)
+
+	ctx.JSON(http.StatusOK, books)
 }
 
 func (h *BookHandler) GetBookByID(ctx *gin.Context) {
@@ -48,47 +51,56 @@ func (h *BookHandler) GetBookByID(ctx *gin.Context) {
 
 	book, err := h.service.GetBookByID(id)
 	if err != nil {
-		ctx.JSON(404, gin.H{"error": err.Error()})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "livro não encontrado"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(200, book)
+	ctx.JSON(http.StatusOK, book)
 }
 
 func (h *BookHandler) UpdateBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	// 2. Faz o Bind do JSON para o DTO de Request
-	var req entity.Book
+	var req dto.UpdateBookRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(500, gin.H{"error": "Dados inválidos: " + err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.service.UpdateBook(id, &req)
+	book, err := h.service.UpdateBook(id, req)
 	if err != nil {
-		ctx.JSON(404, gin.H{"error": err})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "livro não encontrado"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	ctx.JSON(200, req)
+	ctx.JSON(http.StatusOK, book)
 }
 
 func (h *BookHandler) DeleteBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if id == "" {
-		ctx.JSON(400, gin.H{"error": "id is required"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id é obrigatório"})
 		return
 	}
 
 	err := h.service.DeleteBook(id)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			ctx.JSON(404, gin.H{"error": err.Error()})
+		if errors.Is(err, gorm.ErrRecordNotFound) || strings.Contains(err.Error(), "not found") {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
-		ctx.JSON(500, gin.H{"error": "internal server error"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "erro interno do servidor"})
 		return
 	}
-	ctx.JSON(200, gin.H{"message": "Book deleted successfully"})
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "livro excluído com sucesso"})
 }
